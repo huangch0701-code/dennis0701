@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小柑橘 Line圖文選單</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            display: flex; justify-content: center; align-items: center; 
+            background: #e2e8f0; font-family: 'Noto Sans TC', sans-serif; 
+            min-height: 100vh; padding: 20px;
+        }
+
+        /* Line 圖文選單標準大尺寸比例 (2500x1686)，這裡等比例縮小方便預覽 */
+        .rich-menu-container {
+            width: 1000px;
+            height: 674px;
+            background-color: #fffaf1; /* 小柑橘溫暖米白底 */
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 15px; /* 格線間距 */
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #fff;
+        }
+
+        /* 柑橘浮水印裝飾 */
+        .watermark {
+            position: absolute;
+            font-size: 400px;
+            color: rgba(249, 115, 22, 0.03);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .wm-1 { top: -100px; left: -100px; transform: rotate(-15deg); }
+        .wm-2 { bottom: -150px; right: -50px; transform: rotate(15deg); }
+
+        /* 按鈕卡片通用樣式 */
+        .menu-item {
+            background: #ffffff;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #1e293b;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.05);
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.15);
+            border-color: #fed7aa;
+        }
+
+        .menu-icon {
+            width: 80px;
+            height: 80px;
+            background: #fff7ed;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            color: #f97316;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .menu-icon {
+            background: #f97316;
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .menu-title {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .menu-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 特殊按鈕：社群媒體 (保留品牌辨識度) */
+        .item-ig .menu-icon {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+        }
+        .item-fb .menu-icon {
+            background: #1877F2;
+            color: white;
+        }
+
+        /* 特殊按鈕：主推行動呼籲 (CTA) - 加盟表單 */
+        .item-cta {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 30px rgba(234, 88, 12, 0.3);
+        }
+        
+        .item-cta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(234, 88, 12, 0.4);
+            border: none;
+        }
+
+        .item-cta .menu-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .item-cta:hover .menu-icon {
+            background: white;
+            color: #ea580c;
+        }
+
+        .item-cta .menu-title { color: white; }
+        .item-cta .menu-subtitle { color: rgba(255, 255, 255, 0.8); }
+
+        /* 特殊按鈕：敬請期待 -> 改為實用功能 (如 QA 或 預約) */
+        .item-disabled {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+        }
+        .item-disabled .menu-icon {
+            background: #e2e8f0;
+            color: #94a3b8;
+        }
+        .item-disabled .menu-title { color: #64748b; }
+
+    </style>
+</head>
+<body>
+
+    <div class="rich-menu-container">
+        <!-- 背景浮水印 -->
+        <i class="fa-solid fa-lemon watermark wm-1"></i>
+        <i class="fa-solid fa-lemon watermark wm-2"></i>
+
+        <!-- 區塊 1: 加盟資訊 -->
+        <div class="menu-item">
+            <div class="menu-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="menu-title">加盟方案</div>
+            <div class="menu-subtitle">Franchise Info</div>
+        </div>
+
+        <!-- 區塊 2: Instagram -->
+        <div class="menu-item item-ig">
+            <div class="menu-icon"><i class="fa-brands fa-instagram"></i></div>
+            <div class="menu-title">Instagram</div>
+            <div class="menu-subtitle">Official IG</div>
+        </div>
+
+        <!-- 區塊 3: Facebook -->
+        <div class="menu-item item-fb">
+            <div class="menu-icon"><i class="fa-brands fa-facebook-f"></i></div>
+            <div class="menu-title">Facebook</div>
+            <div class="menu-subtitle">Official Fanpage</div>
+        </div>
+
+        <!-- 區塊 4: 優勢介紹 -->
+        <div class="menu-item">
+            <div class="menu-icon"><i class="fa-solid fa-ranking-star"></i></div>
+            <div class="menu-title">品牌優勢</div>
+            <div class="menu-subtitle">Core Strengths</div>
+        </div>
+
+        <!-- 區塊 5: 加盟表單 (核心 CTA，用全橘色突顯) -->
+        <div class="menu-item item-cta">
+            <div class="menu-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+            <div class="menu-title">立即申請</div>
+            <div class="menu-subtitle">Apply Now</div>
+        </div>
+
+        <!-- 區塊 6: 原本是敬請期待，建議改成「常見QA」或「聯絡客服」增加實用性 -->
+        <div class="menu-item">
+            <div class="menu-icon"><i class="fa-solid fa-circle-question"></i></div>
+            <div class="menu-title">常見 Q&A</div>
+            <div class="menu-subtitle">Questions</div>
+        </div>
+
+    </div>
+
+</body>
+</html>
