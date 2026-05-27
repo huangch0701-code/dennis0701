@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隨機笑話生成器 - Joke Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 25px;
+            padding: 50px 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+
+        .joke-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .joke-box.loading {
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .joke-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .joke-category {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        .btn-share {
+            background: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-share:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-share:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            background: white;
+            color: #333;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            padding: 15px;
+            background: #ffe6e6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>😂 笑話生成器</h1>
+        <div class="subtitle">Joke Generator</div>
+
+        <div class="category-filter">
+            <button class="category-btn active" onclick="setCategory('any')">全部</button>
+            <button class="category-btn" onclick="setCategory('programming')">程式</button>
+            <button class="category-btn" onclick="setCategory('knock-knock')">敲門</button>
+            <button class="category-btn" onclick="setCategory('general')">一般</button>
+        </div>
+
+        <div class="error-message" id="errorMsg"></div>
+
+        <div class="joke-box" id="jokeBox">
+            <div>
+                <span class="joke-icon">😄</span>
+                <p>點擊按鈕獲取笑話...</p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-generate" onclick="getJoke()" id="generateBtn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> 生成笑話
+            </button>
+            <button class="btn-share" onclick="shareJoke()" id="shareBtn" disabled>
+                <i class="fa-solid fa-share-nodes"></i> 分享
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentJoke = '';
+        let selectedCategory = 'any';
+
+        function setCategory(category) {
+            selectedCategory = category;
+            // 更新按鈕樣式
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        async function getJoke() {
+            const jokeBox = document.getElementById('jokeBox');
+            const errorMsg = document.getElementById('errorMsg');
+            const generateBtn = document.getElementById('generateBtn');
+
+            // 隱藏錯誤訊息
+            errorMsg.classList.remove('show');
+
+            // 顯示載入中
+            jokeBox.innerHTML = '<div class="loading-spinner"></div>';
+            jokeBox.classList.add('loading');
+            generateBtn.disabled = true;
+
+            try {
+                let url = 'https://official-joke-api.appspot.com/random_joke';
+
+                // 如果選擇了特定類別
+                if (selectedCategory !== 'any') {
+                    url = `https://official-joke-api.appspot.com/jokes/${selectedCategory}/random`;
+                }
+
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error('無法取得笑話，請重試');
+                }
+
+                let data = await response.json();
+
+                // 如果是陣列，取第一個
+                if (Array.isArray(data)) {
+                    data = data[0];
+                }
+
+                // 組合笑話
+                currentJoke = `${data.setup}\n\n${data.punchline}`;
+
+                // 顯示笑話
+                jokeBox.innerHTML = `
+                    <div>
+                        <span class="joke-icon">😂</span>
+                        <div class="joke-category">${data.type}</div>
+                        <p style="margin-top: 15px;">${data.setup}</p>
+                        <p style="margin-top: 15px; font-weight: 900; font-size: 22px; color: #ffd700;">${data.punchline}</p>
+                    </div>
+                `;
+
+                jokeBox.classList.remove('loading');
+                document.getElementById('shareBtn').disabled = false;
+
+            } catch (error) {
+                jokeBox.innerHTML = `<p>❌ 發生錯誤：${error.message}</p>`;
+                jokeBox.classList.remove('loading');
+                errorMsg.textContent = error.message;
+                errorMsg.classList.add('show');
+                document.getElementById('shareBtn').disabled = true;
+            } finally {
+                generateBtn.disabled = false;
+            }
+        }
+
+        function shareJoke() {
+            if (!currentJoke) return;
+
+            // 複製到剪貼板
+            navigator.clipboard.writeText(currentJoke).then(() => {
+                // 顯示成功提示
+                const shareBtn = document.getElementById('shareBtn');
+                const originalText = shareBtn.innerHTML;
+                shareBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已複製！';
+
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('複製失敗，請手動複製');
+            });
+        }
+
+        // 頁面載入時自動獲取一個笑話
+        window.addEventListener('load', getJoke);
+    </script>
+
+</body>
+</html>
